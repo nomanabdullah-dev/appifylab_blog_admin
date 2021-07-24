@@ -68,7 +68,7 @@
 
 
             <!-- tag deleting modal -->
-            <Modal v-model="showDeleteModal" width="360">
+            <!-- <Modal v-model="showDeleteModal" width="360">
                 <p slot="header" style="color:#f60;text-align:center">
                     <Icon type="ios-information-circle"></Icon>
                     <span>Delete confirmation</span>
@@ -79,12 +79,15 @@
                 <div slot="footer">
                     <Button type="error" size="large" long :loading="isDeleting" :disabled="isDeleting" @click="deleteTag">Delete</Button>
                 </div>
-            </Modal>
+            </Modal> -->
+            <deleteModal></deleteModal>
         </div>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import deleteModal from '../components/deleteModal.vue'
     export default {
         data(){
             return{
@@ -151,22 +154,28 @@
                 }
             },
             showDeletingModal(tag, i){
-                this.deleteItem = tag
-                this.deletingIndex = i
-                this.showDeleteModal = true
-            },
-            async deleteTag(){
-                this.isDeleting = true
-                const res = await this.callApi('post', 'app/delete_tag', this.deleteItem)
-                if(res.status===200){
-                    this.tags.splice(this.deletingIndex,1)
-                    this.s('Tag has been deleted successfully!')
-                }else{
-                    this.swr()
+                const deleteModalObj = {
+                    showDeleteModal : true,
+                    deleteUrl : 'app/delete_tag',
+                    data : tag,
+                    deletingIndex: i,
+                    isDeleted : false,
                 }
-                this.isDeleting = false
-                this.showDeleteModal = false
-            }
+                this.$store.commit('setDeletingModalObj', deleteModalObj)
+                //console.log('delete method called')
+            },
+            // async deleteTag(){
+            //     this.isDeleting = true
+            //     const res = await this.callApi('post', 'app/delete_tag', this.deleteItem)
+            //     if(res.status===200){
+            //         this.tags.splice(this.deletingIndex,1)
+            //         this.s('Tag has been deleted successfully!')
+            //     }else{
+            //         this.swr()
+            //     }
+            //     this.isDeleting = false
+            //     this.showDeleteModal = false
+            // }
         },
         async created(){
             const res = await this.callApi('get', 'app/get_tags')
@@ -174,6 +183,20 @@
                 this.tags = res.data
             }else{
                 this.swr()
+            }
+        },
+        components : {
+            deleteModal
+        },
+        computed : {
+            ...mapGetters(['getDeleteModalObj'])
+        },
+        watch : {
+            getDeleteModalObj(obj){
+                console.log(obj)
+                if(obj.isDeleted){
+                    this.tags.splice(obj.deletingIndex,1)
+                }
             }
         }
     }

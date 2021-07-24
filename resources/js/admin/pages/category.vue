@@ -122,7 +122,7 @@
 
 
             <!-- category deleting modal -->
-            <Modal v-model="showDeleteModal" width="360">
+            <!-- <Modal v-model="showDeleteModal" width="360">
                 <p slot="header" style="color:#f60;text-align:center">
                     <Icon type="ios-information-circle"></Icon>
                     <span>Delete confirmation</span>
@@ -133,12 +133,15 @@
                 <div slot="footer">
                     <Button type="error" size="large" long :loading="isDeleting" :disabled="isDeleting" @click="deleteCategory">Delete</Button>
                 </div>
-            </Modal>
+            </Modal> -->
+            <deleteModal></deleteModal>
         </div>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import deleteModal from '../components/deleteModal.vue'
     export default {
         data(){
             return{
@@ -226,9 +229,17 @@
                 this.editModal = false
             },
             showDeletingModal(category, i){
-                this.deleteItem = category
-                this.deletingIndex = i
-                this.showDeleteModal = true
+                const deleteModalObj = {
+                    showDeleteModal : true,
+                    deleteUrl : 'app/delete_category',
+                    data : category,
+                    deletingIndex: i,
+                    isDeleted : false,
+                }
+                this.$store.commit('setDeletingModalObj', deleteModalObj)
+                // this.deleteItem = category
+                // this.deletingIndex = i
+                // this.showDeleteModal = true
             },
             async deleteCategory(){
                 this.isDeleting = true
@@ -297,6 +308,19 @@
                 this.CategoryLists = res.data
             }else{
                 this.swr()
+            }
+        },
+        components : {
+            deleteModal
+        },
+        computed : {
+            ...mapGetters(['getDeleteModalObj'])
+        },
+        watch : {
+            getDeleteModalObj(obj){
+                if(obj.isDeleted){
+                    this.CategoryLists.splice(obj.deletingIndex,1)
+                }
             }
         }
     }

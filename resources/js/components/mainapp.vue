@@ -20,6 +20,7 @@
               <li><router-link :to="{name: 'home'}"><Icon type="ios-speedometer" /> Dashboard</router-link></li>
               <li><router-link :to="{name: 'tags'}"><Icon type="ios-speedometer" /> Tags</router-link></li>
               <li><router-link :to="{name: 'category'}"><Icon type="ios-speedometer" /> Category</router-link></li>
+              <li><router-link :to="{name: 'adminusers'}"><Icon type="ios-speedometer" /> Admin Users</router-link></li>
             </ul>
           </div>
         </div>

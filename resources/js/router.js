@@ -6,6 +6,8 @@ Vue.use(Router)
 import home from './components/pages/home.vue'
 import tags from './admin/pages/tags.vue'
 import category from './admin/pages/category.vue'
+// admin user
+import adminusers from './admin/pages/adminusers.vue'
 
 const routes = [
     {
@@ -22,7 +24,13 @@ const routes = [
         path: '/category',
         component: category,
         name: 'category'
-    }
+    },
+    //admin users
+    {
+        path: '/adminusers',
+        component: adminusers,
+        name: 'adminusers'
+    },
 ]
 
 export default new Router({

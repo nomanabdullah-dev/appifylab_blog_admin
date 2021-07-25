@@ -24,7 +24,7 @@
                             <td>{{ user.id }}</td>
                             <td class="_table_name">{{ user.fullName }}</td>
                             <td>{{ user.email }}</td>
-                            <td>{{ user.userType }}</td>
+                            <td>{{ user.role_id }}</td>
                             <td>{{ user.created_at }}</td>
                             <td>
                                 <Button type="info" size="small" @click="showEditModal(user, i)">Edit</Button>
@@ -47,9 +47,8 @@
                 <Input type="text" v-model="data.fullName" placeholder="Enter full name" style="margin-bottom:7px"/>
                 <Input type="email" v-model="data.email" placeholder="Enter email" style="margin-bottom:7px"/>
                 <Input type="password" v-model="data.password" placeholder="Enter password" style="margin-bottom:7px"/>
-                <Select v-model="data.userType" placeholder="Select Admin Type">
-                    <Option value="Admin">Admin</Option>
-                    <Option value="Editor">Editor</Option>
+                <Select v-model="data.role_id" placeholder="Select Admin Type">
+                    <Option :value="r.id" v-for="(r, i) in roles" :key="i" v-if="roles.length">{{r.roleName}}</Option>
                 </Select>
                 <div slot="footer">
                     <Button type="default" @click="addModal=false">Close</Button>
@@ -66,9 +65,8 @@
                 <Input type="text" v-model="editData.fullName" placeholder="Enter full name" style="margin-bottom:7px"/>
                 <Input type="email" v-model="editData.email" placeholder="Enter email" style="margin-bottom:7px"/>
                 <Input type="password" v-model="editData.password" placeholder="Enter password" style="margin-bottom:7px"/>
-                <Select v-model="editData.userType" placeholder="Select Admin Type">
-                    <Option value="Admin">Admin</Option>
-                    <Option value="Editor">Editor</Option>
+                <Select v-model="editData.role_id" placeholder="Select Admin Type">
+                    <Option :value="r.id" v-for="(r, i) in roles" :key="i" v-if="roles.length">{{r.roleName}}</Option>
                 </Select>
                 <div slot="footer">
                     <Button type="default" @click="editModal=false">Close</Button>
@@ -91,23 +89,24 @@ import deleteModal from '../components/deleteModal.vue'
                     fullName : '',
                     email : '',
                     password : '',
-                    userType : 'Admin'
+                    role_id : null
                 },
                 addModal: false,
                 editModal: false,
                 isAdding: false,
                 users: [],
+                roles : [],
                 editData: {
                     fullName : '',
                     email : '',
                     password : '',
-                    userType : 'Admin'
+                    role_id : null
                 },
                 index: -1,
                 showDeleteModal: false,
                 isDeleting: false,
                 deleteItem: {},
-                deletingIndex: -1
+                deletingIndex: -1,
             }
         },
         methods:{
@@ -115,11 +114,11 @@ import deleteModal from '../components/deleteModal.vue'
                 if(this.data.fullName.trim()=='') return this.e('Full name is required')
                 if(this.data.email.trim()=='') return this.e('Email is required')
                 if(this.data.password.trim()=='') return this.e('Password is required')
-                if(this.data.userType.trim()=='') return this.e('User type is required')
+                if(!this.data.role_id) return this.e('User type is required')
 
                 const res = await this.callApi('post', 'app/create_user', this.data)
                 if (res.status===201){
-                    //this.tags.unshift(res.data)
+                    this.users.unshift(res.data)
                     this.s('Admin user has been added successfully!')
                     this.addModal = false
                     this.data.fullName = ''
@@ -150,7 +149,7 @@ import deleteModal from '../components/deleteModal.vue'
             async editAdmin(){
                 if(this.editData.fullName.trim()=='') return this.e('Full name is required')
                 if(this.editData.email.trim()=='') return this.e('Email is required')
-                if(this.editData.userType.trim()=='') return this.e('User type is required')
+                if(!this.editData.role_id) return this.e('User type is required')
 
                 const res = await this.callApi('post', 'app/edit_user', this.editData)
                 if (res.status===200){
@@ -167,11 +166,11 @@ import deleteModal from '../components/deleteModal.vue'
                     }
                 }
             },
-            showDeletingModal(tag, i){
+            showDeletingModal(user, i){
                 const deleteModalObj = {
                     showDeleteModal : true,
-                    deleteUrl : 'app/delete_tag',
-                    data : tag,
+                    deleteUrl : 'app/delete_user',
+                    data : user,
                     deletingIndex: i,
                     isDeleted : false,
                 }
@@ -179,9 +178,17 @@ import deleteModal from '../components/deleteModal.vue'
             },
         },
         async created(){
-            const res = await this.callApi('get', 'app/get_users')
+            const [res, resRole] = await Promise.all([
+                this.callApi('get', 'app/get_users'),
+                this.callApi('get', 'app/get_roles')
+            ]);
             if(res.status == 200){
                 this.users = res.data
+            }else{
+                this.swr()
+            }
+            if(resRole.status == 200){
+                this.roles = resRole.data
             }else{
                 this.swr()
             }

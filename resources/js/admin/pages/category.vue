@@ -237,22 +237,19 @@ import deleteModal from '../components/deleteModal.vue'
                     isDeleted : false,
                 }
                 this.$store.commit('setDeletingModalObj', deleteModalObj)
-                // this.deleteItem = category
-                // this.deletingIndex = i
-                // this.showDeleteModal = true
             },
-            async deleteCategory(){
-                this.isDeleting = true
-                const res = await this.callApi('post', 'app/delete_category', this.deleteItem)
-                if(res.status===200){
-                    this.CategoryLists.splice(this.deletingIndex,1)
-                    this.s('Category has been deleted successfully!')
-                }else{
-                    this.swr()
-                }
-                this.isDeleting = false
-                this.showDeleteModal = false
-            },
+            // async deleteCategory(){
+            //     this.isDeleting = true
+            //     const res = await this.callApi('post', 'app/delete_category', this.deleteItem)
+            //     if(res.status===200){
+            //         this.CategoryLists.splice(this.deletingIndex,1)
+            //         this.s('Category has been deleted successfully!')
+            //     }else{
+            //         this.swr()
+            //     }
+            //     this.isDeleting = false
+            //     this.showDeleteModal = false
+            // },
 
             //delete image
             async deleteImage(isAdd=true){

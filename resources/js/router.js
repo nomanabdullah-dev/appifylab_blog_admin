@@ -8,6 +8,12 @@ import tags from './admin/pages/tags.vue'
 import category from './admin/pages/category.vue'
 // admin user
 import adminusers from './admin/pages/adminusers.vue'
+//login
+import login from './admin/pages/login.vue'
+//role
+import role from './admin/pages/role.vue'
+import assignRole from './admin/pages/assignRole.vue'
+
 
 const routes = [
     {
@@ -30,6 +36,23 @@ const routes = [
         path: '/adminusers',
         component: adminusers,
         name: 'adminusers'
+    },
+    //login
+    {
+        path: '/login',
+        component: login,
+        name: 'login'
+    },
+    //role
+    {
+        path: '/role',
+        component: role,
+        name: 'role'
+    },
+    {
+        path: '/assignRole',
+        component: assignRole,
+        name: 'assignRole'
     },
 ]
 

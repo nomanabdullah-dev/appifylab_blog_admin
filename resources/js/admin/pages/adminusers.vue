@@ -203,7 +203,7 @@ import deleteModal from '../components/deleteModal.vue'
             getDeleteModalObj(obj){
                 console.log(obj)
                 if(obj.isDeleted){
-                    this.tags.splice(obj.deletingIndex,1)
+                    this.users.splice(obj.deletingIndex,1)
                 }
             }
         }

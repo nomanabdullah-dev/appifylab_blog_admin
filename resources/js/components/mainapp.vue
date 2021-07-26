@@ -18,30 +18,19 @@
                     <!--~~~ MENU LIST ~~~~~~-->
                     <div class="_1side_menu_list">
                         <ul class="_1side_menu_list_ul">
-                            <li>
-                                <router-link :to="{name: 'home'}">
-                                    <Icon type="ios-speedometer"/> Dashboard</router-link>
+                            <li v-for="(menuItem, i) in permission" :key="i" v-if="permission.length && menuItem.read">
+                                <router-link :to="menuItem.name"><Icon type="ios-speedometer"/> {{menuItem.resourceName}}</router-link>
                             </li>
-                            <li>
-                                <router-link :to="{name: 'tags'}">
-                                    <Icon type="ios-speedometer"/> Tags</router-link>
+                            <!-- <li><router-link :to="{name: 'tags'}"><Icon type="ios-speedometer"/> Tags</router-link>
                             </li>
-                            <li>
-                                <router-link :to="{name: 'category'}">
-                                    <Icon type="ios-speedometer"/> Category</router-link>
+                            <li><router-link :to="{name: 'category'}"><Icon type="ios-speedometer"/> Category</router-link>
                             </li>
-                            <li>
-                                <router-link :to="{name: 'adminusers'}">
-                                    <Icon type="ios-speedometer"/> Admin Users</router-link>
+                            <li><router-link :to="{name: 'adminusers'}"><Icon type="ios-speedometer"/> Admin Users</router-link>
                             </li>
-                            <li>
-                                <router-link :to="{name: 'role'}">
-                                    <Icon type="ios-speedometer"/> Role Management</router-link>
+                            <li><router-link :to="{name: 'role'}"><Icon type="ios-speedometer"/> Role Management</router-link>
                             </li>
-                            <li>
-                                <router-link :to="{name: 'assignRole'}">
-                                    <Icon type="ios-speedometer"/> Assign Role</router-link>
-                            </li>
+                            <li><router-link :to="{name: 'assignRole'}"><Icon type="ios-speedometer"/> Assign Role</router-link>
+                            </li> -->
                             <li><a href="/logout"><Icon type="ios-speedometer"/> Logout</a></li>
                         </ul>
                     </div>
@@ -71,15 +60,15 @@
 
 <script>
     export default {
-        props : ['user'],
+        props : ['user', 'permission'],
         data() {
             return {
                 isLoggedIn: false
             }
         },
         created(){
-            this.$store.commit('updateUser', this.user)
-            console.log(this.user)
+            this.$store.commit('setUpdateUser', this.user)
+            this.$store.commit('setUserPermission', this.permission)
         }
     }
 

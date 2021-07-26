@@ -17,6 +17,7 @@ class CreateBlogsTable extends Migration
             $table->id();
             $table->string('title');
             $table->text('post');
+            $table->text('jsonData');
             $table->string('post_excerpt',300);
             $table->string('slug')->unique();
             $table->unsignedBigInteger('user_id');

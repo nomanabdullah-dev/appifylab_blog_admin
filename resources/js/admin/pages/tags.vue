@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <!--~~~~~~~ TABLE ONE ~~~~~~~~~-->
             <div class="_1adminOverveiw_table_recent _box_shadow _border_radious _mar_b30 _p20">
-                <p class="_title0">Tags <Button @click="addModal=true"> <Icon type="md-add" /> Add Tag</Button></p>
+                <p class="_title0">Tags <Button @click="addModal=true" v-if="isWritePermitted"> <Icon type="md-add" /> Add Tag</Button></p>
 
                 <div class="_overflow _table_div">
                     <table class="_table">
@@ -23,8 +23,8 @@
                             <td class="_table_name">{{ tag.tagName }}</td>
                             <td>{{ tag.created_at }}</td>
                             <td>
-                                <Button type="info" size="small" @click="showEditModal(tag, i)">Edit</Button>
-                                <Button type="error" size="small" @click="showDeletingModal(tag, i)" :loading="tag.isDeleting">Delete</Button>
+                                <Button type="info" size="small" @click="showEditModal(tag, i)" v-if="isUpdatePermitted">Edit</Button>
+                                <Button type="error" size="small" @click="showDeletingModal(tag, i)" :loading="tag.isDeleting" v-if="isDeletePermitted">Delete</Button>
                             </td>
                         </tr>
                         <!-- ITEMS -->
@@ -165,6 +165,7 @@ import deleteModal from '../components/deleteModal.vue'
             },
         },
         async created(){
+            console.log(this.isWritePermitted)
             const res = await this.callApi('get', 'app/get_tags')
             if(res.status == 200){
                 this.tags = res.data

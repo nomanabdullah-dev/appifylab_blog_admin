@@ -2,10 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router)
 
-//admin project pages
+//project pages
 import home from './components/pages/home.vue'
 import tags from './admin/pages/tags.vue'
 import category from './admin/pages/category.vue'
+import createBlog from './admin/pages/createBlog.vue'
+import blogs from './admin/pages/blogs.vue'
 // admin user
 import adminusers from './admin/pages/adminusers.vue'
 //login
@@ -30,6 +32,16 @@ const routes = [
         path: '/category',
         component: category,
         name: 'category'
+    },
+    {
+        path: '/createBlog',
+        component: createBlog,
+        name: 'createBlog'
+    },
+    {
+        path: '/blogs',
+        component: blogs,
+        name: 'blogs'
     },
     //admin users
     {

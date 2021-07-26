@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Blog;
+use App\Models\Blogcategory;
+use App\Models\Blogtag;
 use App\Models\Category;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 use function Ramsey\Uuid\v1;
 
@@ -52,7 +56,6 @@ class AdminController extends Controller
     public function getTag(){
         return Tag::orderBy('id', 'desc')->get();
     }
-
     public function addTag(Request $request){
         $this->validate($request, [
             'tagName' => 'required'
@@ -62,7 +65,6 @@ class AdminController extends Controller
             'tagName' => $request->tagName
         ]);
     }
-
     public function editTag(Request $request){
         $this->validate($request, [
             'id'      => 'required',
@@ -73,7 +75,6 @@ class AdminController extends Controller
             'tagName' => $request->tagName
         ]);
     }
-
     public function deleteTag(Request $request){
         $this->validate($request, [
             'id'      => 'required'
@@ -96,13 +97,26 @@ class AdminController extends Controller
         $request->file->move(public_path('uploads'), $picName);
         return $picName;
     }
-
+    //upload image from editor.js
+    public function uploadEditorImage(Request $request){
+        $this->validate($request, [
+            'image'      => 'required|mimes:png,jpg,jpeg'
+        ]);
+        $picName = time().'.'.$request->image->extension();
+        $request->image->move(public_path('uploads'), $picName);
+        return response()->json([
+            'success'=> 1,
+            'file'   => [
+                'url'=> "http://127.0.0.1:8000/uploads/$picName"
+            ]
+        ]);
+    }
+    //category image delete
     public function deleteImage(Request $request){
         $fileName = $request->imageName;
         $this->deleteFileFromServer($fileName, false);
         return 'done';
     }
-
     public function deleteFileFromServer($fileName, $hasFullPath = false){
         if(!$hasFullPath){
             $filePath = public_path().'/uploads/'.$fileName;
@@ -112,7 +126,6 @@ class AdminController extends Controller
         }
         return;
     }
-
     public function addCategory(Request $request){
         $this->validate($request, [
             'categoryName'  => 'required',
@@ -123,7 +136,6 @@ class AdminController extends Controller
             'iconImage'     => $request->iconImage
         ]);
     }
-
     public function editCategory(Request $request){
         $this->validate($request, [
             'categoryName'  => 'required',
@@ -134,7 +146,6 @@ class AdminController extends Controller
             'iconImage'     => $request->iconImage
         ]);
     }
-
     public function deleteCategory(Request $request){
         //first delete the original file from the server
         $this->deleteFileFromServer($request->iconImage);
@@ -143,6 +154,7 @@ class AdminController extends Controller
         ]);
         return Category::where('id', $request->id)->delete();
     }
+
 
     //admin user
     public function createUser(Request $request){
@@ -161,11 +173,9 @@ class AdminController extends Controller
         ]);
         return $user;
     }
-
     public function getUsers(){
         return User::get();
     }
-
     public function editUser(Request $request){
         $this->validate($request, [
             'fullName'  => 'required',
@@ -192,6 +202,7 @@ class AdminController extends Controller
         ]);
         return User::where('id', $request->id)->delete();
     }
+
     //admin login
     public function adminLogin(Request $request){
         $this->validate($request, [
@@ -251,5 +262,57 @@ class AdminController extends Controller
         return Role::where('id', $request->id)->update([
             'permission'=> $request->permission
         ]);
+    }
+
+    //blogdata
+    public function slug(){
+        $title = 'this is a nice title';
+        $blog = Blog::create([
+            'title'         => $title,
+            'post'          => 'some post',
+            'post_excerpt'  => 'aead',
+            'user_id'       => 1,
+            'metaDescription'=> 'aeda',
+        ]);
+        return $blog;
+    }
+    public function createBlog(Request $request){
+        $categories = $request->category_id;
+        $tags       = $request->tag_id;
+
+        $blogCategories = [];
+        $blogTags       = [];
+        DB::beginTransaction();
+        try {
+            $blog = Blog::create([
+                'title'         => $request->title,
+                'post'          => $request->post,
+                'jsonData'      => $request->jsonData,
+                'post_excerpt'  => $request->post_excerpt,
+                'user_id'       => Auth::user()->id,
+                'metaDescription'=> $request->metaDescription,
+            ]);
+            //insert blog categories
+            foreach($categories as $c){
+                array_push($blogCategories, ['category_id'=>$c, 'blog_id'=>$blog->id]);
+            }
+            Blogcategory::insert($blogCategories);
+            //insert blog tags
+            foreach($tags as $t){
+                array_push($blogTags, ['tag_id'=>$t, 'blog_id'=>$blog->id]);
+            }
+            Blogtag::insert($blogTags);
+            DB::commit();
+            return 'done';
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return 'not done';
+        }
+    }
+    public function blogdata(){
+        return Blog::with(['tag', 'cat'])->orderBy('id', 'desc')->get();
+    }
+    public function deleteBlog(Request $request){
+        return Blog::where('id', $request->id)->delete();
     }
 }

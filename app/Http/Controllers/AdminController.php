@@ -277,6 +277,15 @@ class AdminController extends Controller
         return $blog;
     }
     public function createBlog(Request $request){
+        $this->validate($request, [
+            'title'         => 'required',
+            'post'          => 'required',
+            'post_excerpt'  => 'required',
+            'jsonData'      => 'required',
+            'metaDescription'=> 'required',
+            'category_id'   => 'required',
+            'tag_id'        => 'required',
+        ]);
         $categories = $request->category_id;
         $tags       = $request->tag_id;
 
@@ -314,5 +323,55 @@ class AdminController extends Controller
     }
     public function deleteBlog(Request $request){
         return Blog::where('id', $request->id)->delete();
+    }
+    public function singleBlogItem(Request $request, $id){
+        return Blog::with(['tag', 'cat'])->where('id', $id)->first();
+    }
+    //update blog
+    public function updateBlog(Request $request, $id){
+        $this->validate($request, [
+            'title'         => 'required',
+            'post'          => 'required',
+            'post_excerpt'  => 'required',
+            'jsonData'      => 'required',
+            'metaDescription'=> 'required',
+            'category_id'   => 'required',
+            'tag_id'        => 'required',
+        ]);
+        $categories = $request->category_id;
+        $tags       = $request->tag_id;
+
+        $blogCategories = [];
+        $blogTags       = [];
+        DB::beginTransaction();
+        try {
+            $blog = Blog::where('id', $id)->update([
+                'title'         => $request->title,
+                'post'          => $request->post,
+                'jsonData'      => $request->jsonData,
+                'post_excerpt'  => $request->post_excerpt,
+                'user_id'       => Auth::user()->id,
+                'metaDescription'=> $request->metaDescription,
+            ]);
+            //insert blog categories
+            foreach($categories as $c){
+                array_push($blogCategories, ['category_id'=>$c, 'blog_id'=>$id]);
+            }
+            //delete all previous categories
+            Blogcategory::where('blog_id', $id)->delete();
+            Blogcategory::insert($blogCategories);
+            //insert blog tags
+            foreach($tags as $t){
+                array_push($blogTags, ['tag_id'=>$t, 'blog_id'=>$id]);
+            }
+            //delete all previous categories
+            Blogtag::where('blog_id', $id)->delete();
+            Blogtag::insert($blogTags);
+            DB::commit();
+            return 'done';
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return 'not done';
+        }
     }
 }

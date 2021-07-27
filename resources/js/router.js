@@ -7,6 +7,7 @@ import home from './components/pages/home.vue'
 import tags from './admin/pages/tags.vue'
 import category from './admin/pages/category.vue'
 import createBlog from './admin/pages/createBlog.vue'
+import editBlog from './admin/pages/editBlog.vue'
 import blogs from './admin/pages/blogs.vue'
 // admin user
 import adminusers from './admin/pages/adminusers.vue'
@@ -15,6 +16,7 @@ import login from './admin/pages/login.vue'
 //role
 import role from './admin/pages/role.vue'
 import assignRole from './admin/pages/assignRole.vue'
+import notfound from './admin/pages/notfound.vue'
 
 
 const routes = [
@@ -37,6 +39,11 @@ const routes = [
         path: '/createBlog',
         component: createBlog,
         name: 'createBlog'
+    },
+    {
+        path: '/editBlog/:id',
+        component: editBlog,
+        name: 'editBlog'
     },
     {
         path: '/blogs',
@@ -65,6 +72,12 @@ const routes = [
         path: '/assignRole',
         component: assignRole,
         name: 'assignRole'
+    },
+    //not found
+    {
+        path: '*',
+        component: notfound,
+        name: 'notfound'
     },
 ]
 

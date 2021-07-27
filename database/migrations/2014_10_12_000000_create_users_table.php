@@ -18,6 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('fullName');
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('profilePic')->default('/uploads/pic.png');
             $table->string('role_id');
             $table->boolean('isActivated')->default(0);
             $table->string('passwordResetCode')->nullable();

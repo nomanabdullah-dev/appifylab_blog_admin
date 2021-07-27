@@ -33,7 +33,7 @@
                             </td>
                         </tr>
                         <!-- ITEMS -->
-
+                        <Page :total="pageInfo.total" :current="pageInfo.current_page" :page-size="parseInt(pageInfo.per_page)" @on-change="getBlogData" v-if="pageInfo" />
 
                     </table>
                 </div>
@@ -57,7 +57,9 @@ import deleteModal from '../components/deleteModal.vue'
                 showDeleteModal: false,
                 isDeleting: false,
                 deleteItem: {},
-                deletingIndex: -1
+                deletingIndex: -1,
+                total : 1,
+                pageInfo : null
             }
         },
         methods:{
@@ -71,15 +73,18 @@ import deleteModal from '../components/deleteModal.vue'
                 }
                 this.$store.commit('setDeletingModalObj', deleteModalObj)
             },
+            async getBlogData(page = 1){
+                const res = await this.callApi('get', `app/blogsdata?page=${page}&total=${this.total}`)
+                if(res.status == 200){
+                    this.blogs = res.data.data
+                    this.pageInfo = res.data
+                }else{
+                    this.swr()
+                }
+            }
         },
         async created(){
-            console.log(this.isWritePermitted)
-            const res = await this.callApi('get', 'app/blogsdata')
-            if(res.status == 200){
-                this.blogs = res.data
-            }else{
-                this.swr()
-            }
+            this.getBlogData()
         },
         components : {
             deleteModal

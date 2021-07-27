@@ -2912,7 +2912,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       showDeleteModal: false,
       isDeleting: false,
       deleteItem: {},
-      deletingIndex: -1
+      deletingIndex: -1,
+      total: 1,
+      pageInfo: null
     };
   },
   methods: {
@@ -2927,36 +2929,56 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         isDeleted: false
       };
       this.$store.commit('setDeletingModalObj', deleteModalObj);
+    },
+    getBlogData: function getBlogData() {
+      var _arguments = arguments,
+          _this = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var page, res;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                page = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : 1;
+                _context.next = 3;
+                return _this.callApi('get', "app/blogsdata?page=".concat(page, "&total=").concat(_this.total));
+
+              case 3:
+                res = _context.sent;
+
+                if (res.status == 200) {
+                  _this.blogs = res.data.data;
+                  _this.pageInfo = res.data;
+                } else {
+                  _this.swr();
+                }
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
     }
   },
   created: function created() {
-    var _this = this;
+    var _this2 = this;
 
-    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var res;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
         while (1) {
-          switch (_context.prev = _context.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
-              console.log(_this.isWritePermitted);
-              _context.next = 3;
-              return _this.callApi('get', 'app/blogsdata');
+              _this2.getBlogData();
 
-            case 3:
-              res = _context.sent;
-
-              if (res.status == 200) {
-                _this.blogs = res.data;
-              } else {
-                _this.swr();
-              }
-
-            case 5:
+            case 1:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
         }
-      }, _callee);
+      }, _callee2);
     }))();
   },
   components: {
@@ -73353,7 +73375,18 @@ var render = function() {
                           )
                         ])
                       : _vm._e()
-                  })
+                  }),
+                  _vm._v(" "),
+                  _vm.pageInfo
+                    ? _c("Page", {
+                        attrs: {
+                          total: _vm.pageInfo.total,
+                          current: _vm.pageInfo.current_page,
+                          "page-size": parseInt(_vm.pageInfo.per_page)
+                        },
+                        on: { "on-change": _vm.getBlogData }
+                      })
+                    : _vm._e()
                 ],
                 2
               )
